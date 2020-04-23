@@ -11,5 +11,8 @@ add a remote repo to the project -> (view)command pallette -> Git: add remote ->
 then we push by clicking the "..." button -> "push" or on the left button the sync sign
 
 
+here is the changes to my new test
+
+
 
 
