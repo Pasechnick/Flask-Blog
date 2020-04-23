@@ -1,0 +1,92 @@
+PART 1
+
+> pip3 install flask
+
+//checking the flask
+
+> python3 
+>> import flask
+
+// if there are no error everything is fine
+
+then we are ready to create the app 
+
+>> exit() to exit python3 LOG
+
+then we build flaskblog.py
+
+        from flask import Flask
+
+        app = Flask(__name__)
+
+        @app.route("/")
+        def hello():
+            return "Hello World !" // or this: return "<h1> Home Page <h1>"
+
+===============================
+
+> export FLASK_APP=flaskblog.py // command to run flask app so we can run this app using "flask run" command in terminal
+in windows we use "set" instead of "export" on mac
+
+> flask run  // will run the app on the ip adress of my local mashine (local host) through the port 5000 (http://127.0.0.1:5000/) 
+localhost:5000 - is the adress where the server is running on the mashine
+
+> crt+c to exit
+
+> export FLASK_DEBUG=1 //seting this env variable to be 1, will make debug mode usefull for use so we do not need to restart the server by pressing ctr + c
+
+================================
+
+by adding 
+
+        if __name__ == '__main__':
+            app.run(debug=True)
+
+we can start the server using directly as well as "flask run" command so we have two options to run the app
+
+> python3 flaskblog.py
+
+================================
+
+adding the about page:
+
+        @app.route("/about")
+        def about():
+            return "<h1> About Page <h1>"
+
+we can access the about page http://localhost:5000/about
+
+================================
+
+we add another route so we can access "home" both ways
+and changed the function name to home instead of hello
+
+@app.route("/")
+@app.route("/home")
+def home():
+    return "<h1> Home Page <h1>"
+
+================================
+
+END result: 
+
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+@app.route("/home")
+def home():
+    return "<h1> Home Page <h1>"
+
+
+@app.route("/about")
+def about():
+    return "<h1> About Page <h1>"
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+
