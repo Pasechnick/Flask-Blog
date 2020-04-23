@@ -1,0 +1,13 @@
+initialize the folder with git
+
+get the repo on the git hub (the link)
+
+make an initial commit of the project
+
+add a remote repo to the project -> (view)command pallette -> Git: add remote -> give the name and the url of the repo
+
+then we push by clicking the "..." button -> "push" or on the left button the sync sign
+
+
+
+
