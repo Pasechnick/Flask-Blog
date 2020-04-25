@@ -1,0 +1,11 @@
+we need to install the WTF forms 
+
+> pip3 install flask-wtf
+
+
+to get a random key we can use python 
+
+> python3
+>>> import secrets 
+>>> secrets.token_hex(16)
+'5e5b968d2e77c6d37d2b17ee2bc819de'  // gives a 16 bit code 
