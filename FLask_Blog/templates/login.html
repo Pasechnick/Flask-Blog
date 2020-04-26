@@ -3,7 +3,7 @@
 {% block content %}
 
     <div class = "content-section">
-        <!-- so the form will back -->
+        
         <form method="POST" action=""> 
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
@@ -19,7 +19,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <!-- then if there are no errors it goes there: -->
+                        
                         {{ form.email(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
@@ -33,7 +33,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <!-- then if there are no errors it goes there: -->
+                        
                         {{ form.password(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>

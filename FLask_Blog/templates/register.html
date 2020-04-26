@@ -3,15 +3,14 @@
 {% block content %}
 
     <div class = "content-section">
-        <!-- so the form will back -->
+        
         <form method="POST" action=""> 
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Join Today</legend> 
                 <div class ="form-group">
                     {{ form.username.label(class="form-control-label") }}
-                    <!-- each of this fields with bootstrap has an error validation so we can  detect it and write the user what is happening and what error it was -->
-                    <!-- so we need to put class "is-invalid" in our field and the a div with invalid feedback  -->
+                    
                     {% if form.username.errors %} 
                         {{ form.username(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -20,7 +19,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <!-- then if there are no errors it goes there: -->
+                        
                         {{ form.username(class="form-control form-control-lg") }}
                     {% endif %}
                     
@@ -35,7 +34,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <!-- then if there are no errors it goes there: -->
+                        
                         {{ form.email(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
@@ -49,7 +48,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <!-- then if there are no errors it goes there: -->
+                        
                         {{ form.password(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
@@ -63,7 +62,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <!-- then if there are no errors it goes there: -->
+                        
                         {{ form.confirm_password(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
