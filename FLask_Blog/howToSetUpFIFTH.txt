@@ -14,9 +14,12 @@ at this point the python does not know what flaskblog is cuz after we run the fl
 and python names the name of the running script "__main__" and not "flaskblog" so when it gets to the line "from flaskblog import db" 
 the python does not know what flaskblog is, it only knows "__main__". 
 So we can change "from flaskblog import db" to "from __main__ import db", 
-but then there is one more error cuz it could not find "db" variable cuz this variable is unreachable for import and it can not import "db"
+but then there is one more error cuz it could not find "db" variable cuz this variable is unreachable for import and it can not import "db" -> so we can move the "from flaskblog import db" under the "db" initialization then the app will work
+But if for some case the database (site.db) was deleted or not created inside the python it will crush gain so we need to find other solution 
 
-So there is a good not ugly solution: to set up our code in the way where we are not running flaskblog directly, so there is no need to import "__main__" 
+So there is a good, not ugly solution: to set up our code in the way where we are not running flaskblog directly, so there is no need to import "__main__" 
 we turn the app into the package - it will make all this imports more simple and allows us to separate things out better then now.
 
-To tell python that our app is a package we need to create a folder (flaskblog) within our project with "__init__" file name inside. Then we move all our files inside this folder 
+To tell python that our app is a package we need to create a folder (flaskblog) within our project with "__init__" file name inside. Then we move all our files inside this folder.
+
+
