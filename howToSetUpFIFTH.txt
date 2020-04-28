@@ -23,3 +23,57 @@ we turn the app into the package - it will make all this imports more simple and
 To tell python that our app is a package we need to create a folder (flaskblog) within our project with "__init__" file name inside. Then we move all our files inside this folder.
 
 
+So the __init__ file will be where we initialize our app to bring together different components.
+
+We move all the imports from the flaskblog.py to __init__, then we need to create a separated file for our routes. We reorganize all imports and ect, so the app has a package form 
+
+after all we have this form:
+
+├── flaskblog             # flaskblog package
+│   ├── __init__.py       # tells python that this is a package also ties and initialize together everything that we need for our app 
+│   ├── forms.py          
+│   ├── models.py
+│   ├── routes.py          # contains all the routes 
+│   ├── static
+│   │   └── main.css
+│   └── templates
+│       ├── about.html
+│       ├── home.html
+│       ├── layout.html
+│       ├── login.html
+│       └── register.html
+└── run.py                  # runs the app
+
+to run the app right now we can use:
+
+> python3 run.py 
+
+after we have deleted the "site.db" we can recreate the db:
+
+> python3 
+>>> from flaskblog import db  # makes instance of db
+>>> from flaskblog.models import User, Post  # creates a db structure 
+>>> db.create_all()  # creates an actual db file 
+>>> User.query.all()  # asks for the variables in the User table 
+[]
+
+├── flaskblog
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-38.pyc
+│   │   ├── forms.cpython-38.pyc
+│   │   ├── models.cpython-38.pyc
+│   │   └── routes.cpython-38.pyc
+│   ├── forms.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── site.db                     # so we have right now the database file created
+│   ├── static
+│   │   └── main.css
+│   └── templates
+│       ├── about.html
+│       ├── home.html
+│       ├── layout.html
+│       ├── login.html
+│       └── register.html
+└── run.py
