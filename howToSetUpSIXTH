@@ -48,3 +48,16 @@ with build in python console inside the error page just by clicking at the neede
 and entering the debugger PIN for the server (look up in the terminal after we run "python3 run.py"), but that is handy only 
 during the developing process itself and not when the web app is deployed, cuz this way some users can look up a hidden info through that error page
 
+THEN we need to create a log in system with the flasklogin 
+
+> pip3 install flask-login
+
+then we add this extension to init file. So we add some functionality to our db (models.py) so it will handle all login sessions at the background for us
+
+so after we are logged in we still see the login and registration routes on the page so we need to redo this:
+we can use current user extension fot logged in and logged out state 
+
+
+we also need to add a restriction for particular routes so i can go to this routes only when i logged in ("u need to be logged in to go there")
+first we create account route and then the template account 
+
