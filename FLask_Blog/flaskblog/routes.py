@@ -1,7 +1,5 @@
 from flask import render_template, url_for, flash, redirect
-from flaskblog import app
-# since we are in the package right now 
-# we need to name the package from where it is imported ("flaskblog.forms", "flaskblog.models")
+from flaskblog import app, db, bcrypt # we need to import "db" and "bcrypt" to use that hash algorithm (remember that before we got the instance of bcrypt class with python3 shell)
 from flaskblog.forms import RegistrationForm, LoginForm 
 from flaskblog.models import User, Post
  
@@ -37,9 +35,14 @@ def about():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        
-        flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('home'))
+        #so if the form valid to submit (all length and signs are correct) we can hash the password and do the authentication procedure 
+        hashed_pasword = bcrypt.generate_password_hash(form.password.data).decode('utf-8') # "form.password.data" is the password that user has entered and ".decode('utf-8')" is needed to decde from bytes to a regular string
+        user = User(username = form.username.data, email = form.email.data, password = hashed_pasword) # getting the data from user into the db, where we get allready hashed password with "password = hashed_pasword"
+        #saving the entered dta to the db
+        db.session.add(user)
+        db.session.commit()
+        flash('Your account has been created ! You are now able to log in', 'success')
+        return redirect(url_for('login'))
     return render_template('register.html', title = 'Register', form = form)
 
 @app.route("/login", methods =['GET', 'POST'])

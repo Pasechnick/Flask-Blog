@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
+        "Bcrypt",
+        "bcrypt",
         "datetime",
         "flaskblog",
         "sqlite"
