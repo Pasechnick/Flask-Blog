@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "Bcrypt",
+        "backref",
         "bcrypt",
         "datetime",
         "flaskblog",
