@@ -1,0 +1,172 @@
+in 9 ver we need to get Pagination - 
+
+if we have lots of posts it can slow down our app so we need to preload only few ahead instead of preload all post once
+
+to inspect what we can do with pagination lets go to the python shell
+
+> python3
+>>> from flaskblog.models import Post  // LETS IMPORT OUR POSTS MODEL
+
+we can loop all posts so we can see them here. This is how we do it right now on the home page. Then we got all 25 of them...
+>>> posts = Post.query.all()
+>>> for post in posts:
+... print(post)
+User('My first updated post', '2020-05-01 19:21:31.789162')
+User('Brand new Post title !', '2020-05-01 19:54:46.997324')
+User('Top 5 Programming Lanaguages', '2020-05-02 07:59:23.737716')
+User('ublime Text Tips and Tricks', '2020-05-02 07:59:41.318037')
+User('est Python IDEs', '2020-05-02 08:00:03.357112')
+User('Flask vs Django - Which Is Better?', '2020-05-02 08:00:14.190126')
+User('These Beers Will Improve Your Programming', '2020-05-02 08:00:30.178967')
+User('ist of PyCon 2018 Talks', '2020-05-02 08:00:49.314418')
+User('ow Dogs in the Workplace Boosts Productivity', '2020-05-02 08:01:05.752321')
+User('The Best Programming Podcasts', '2020-05-02 08:01:29.114291')
+User('ips for Public Speaking', '2020-05-02 08:01:59.018494')
+User('How To Create A YouTube Channel', '2020-05-02 08:02:15.538250')
+User('ow I Record My Videos', '2020-05-02 08:26:30.523147')
+User('Python and Physics', '2020-05-02 08:26:53.469664')
+User('Just A Few More Healines Should Do It', '2020-05-02 08:27:10.757180')
+User('op 10 Python Tips and Tricks', '2020-05-02 08:27:25.539594')
+User('Top 5 YouTube Channels For Learning Programming', '2020-05-02 08:27:43.160432')
+User('My Latest Updated Post', '2020-05-02 08:27:57.323906')
+User('hese Beers Will Improve Your Programming', '2020-05-02 08:28:13.789039')
+User('You Won't Believe These Clickbait Titles!', '2020-05-02 08:28:31.236683')
+User('The Rise of Data Science', '2020-05-02 08:37:30.254737')
+User('Best Videos For Learning Python', '2020-05-02 08:37:49.389908')
+User('Top 10 Python Tips and Tricks', '2020-05-02 08:38:04.430763')
+User('How To Create A YouTube Channel', '2020-05-02 08:38:27.808102')
+User('he Best Programming Podcasts', '2020-05-02 08:38:44.265948')
+
+Then we can look what pagination is: 
+>>> posts = Post.query.paginate()
+>>> posts       
+<flask_sqlalchemy.Pagination object at 0x10884f940>  // says that posts is a pagination object
+
+lets look what attributes and methods this object has:
+>>> dir(posts)
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__',
+ '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__',
+  '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',
+   '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'has_next', 'has_prev', 'items',
+    'iter_pages', 'next', 'next_num', 'page', 'pages', 'per_page', 'prev', 'prev_num', 'query', 'total']
+
+so there are many...
+
+>>> posts.per_page
+20   // it is a default per page since we did not pass anything in
+>>> posts.page // look on what page we are in - current page (gives 1 - we are on the first page)
+1
+
+so right now we can print out items in this page
+>>> for post in posts.items: // to print out all individual posts 
+... print(post)
+
+User('My first updated post', '2020-05-01 19:21:31.789162')
+User('Brand new Post title !', '2020-05-01 19:54:46.997324')
+User('Top 5 Programming Lanaguages', '2020-05-02 07:59:23.737716')
+User('ublime Text Tips and Tricks', '2020-05-02 07:59:41.318037')
+User('est Python IDEs', '2020-05-02 08:00:03.357112')
+User('Flask vs Django - Which Is Better?', '2020-05-02 08:00:14.190126')
+User('These Beers Will Improve Your Programming', '2020-05-02 08:00:30.178967')
+User('ist of PyCon 2018 Talks', '2020-05-02 08:00:49.314418')
+User('ow Dogs in the Workplace Boosts Productivity', '2020-05-02 08:01:05.752321')
+User('The Best Programming Podcasts', '2020-05-02 08:01:29.114291')
+User('ips for Public Speaking', '2020-05-02 08:01:59.018494')
+User('How To Create A YouTube Channel', '2020-05-02 08:02:15.538250')
+User('ow I Record My Videos', '2020-05-02 08:26:30.523147')
+User('Python and Physics', '2020-05-02 08:26:53.469664')
+User('Just A Few More Healines Should Do It', '2020-05-02 08:27:10.757180')
+User('op 10 Python Tips and Tricks', '2020-05-02 08:27:25.539594')
+User('Top 5 YouTube Channels For Learning Programming', '2020-05-02 08:27:43.160432')
+User('My Latest Updated Post', '2020-05-02 08:27:57.323906')
+User('hese Beers Will Improve Your Programming', '2020-05-02 08:28:13.789039')
+User('You Won't Believe These Clickbait Titles!', '2020-05-02 08:28:31.236683')
+
+// will give us only 20 posts maximum, even if we have more (like 25 or more) and the second part (5 posts out of 25) will be on the second page
+
+// to get that second page of items we need to run the same query again
+//  and specify that we want to look up the second page: 
+
+>>> posts = Post.query.paginate(page=2) // so we are on the second page 
+>>> for post in posts.items:            // and we can loop through the items on the second page
+... print(posts)
+... 
+// we get 5 Post objects: last 5 out of 25 
+<flask_sqlalchemy.Pagination object at 0x110754760>
+<flask_sqlalchemy.Pagination object at 0x110754760>
+<flask_sqlalchemy.Pagination object at 0x110754760>
+<flask_sqlalchemy.Pagination object at 0x110754760>
+<flask_sqlalchemy.Pagination object at 0x110754760>
+
+>>> posts = Post.query.paginate(per_page=5) // we can specify that we want only 5 items per page 
+>>> posts.page 
+1                ///we are on the first page right now 
+
+>>> for post in posts.items:   // loops through all items on that first page:
+...  print(post)
+... 
+User('My first updated post', '2020-05-01 19:21:31.789162')
+User('Brand new Post title !', '2020-05-01 19:54:46.997324')
+User('Top 5 Programming Lanaguages', '2020-05-02 07:59:23.737716')
+User('ublime Text Tips and Tricks', '2020-05-02 07:59:41.318037')
+User('est Python IDEs', '2020-05-02 08:00:03.357112')
+
+// we got first 5 posts 
+
+>>> posts = Post.query.paginate(per_page=5, page=2) // going to the second page
+>>> posts.page
+2
+
+>>> for post in posts.items:  // loops through all items on that second page:
+...  print(post)
+... 
+User('Flask vs Django - Which Is Better?', '2020-05-02 08:00:14.190126')
+User('These Beers Will Improve Your Programming', '2020-05-02 08:00:30.178967')
+User('ist of PyCon 2018 Talks', '2020-05-02 08:00:49.314418')
+User('ow Dogs in the Workplace Boosts Productivity', '2020-05-02 08:01:05.752321')
+User('The Best Programming Podcasts', '2020-05-02 08:01:29.114291')
+
+// we got second page with next 5 items (posts)
+
+>>> posts.total
+25                // total amount of posts 
+
+
+right after we have changed the code to work with paginate object 
+we do not have visual pagination on our site, 
+but we can check 2nd, 3rd and so on pages by writing the page in address line:
+
+http://127.0.0.1:5000/?page=2, http://127.0.0.1:5000/?page=3, http://127.0.0.1:5000/?page=4 ad so on...
+
+it will show 5 object per page cuz we code only 5 to appear
+
+
+then we cn change amount of items to show in pur code to 2 and after we go to python shell, 
+>>> python3
+>>> from flaskblog.models import Post
+
+>>> posts = Post.query.paginate(page=6, per_page=2)
+>>> for page in posts.iter_pages():
+...  print(page)
+... 
+1
+2
+None
+4
+5
+6
+7
+8
+9
+10
+None
+12
+13
+
+this way we see 
+
+
+
+right after we have made the pagination the order of posts is old...new, but we want the posts to be shown in new...old way, so we need to reorganize the query call 
+
+add .order_by(Post.date_posted.desc() to posts in routes

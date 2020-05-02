@@ -1,9 +1,9 @@
 import os 
 import secrets
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort # abort needed to prevent update the post if the user didn't made this post
+from flask import render_template, url_for, flash, redirect, request, abort 
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm # PostForm is needed to import all forms we have created  
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm 
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required 
 
@@ -11,7 +11,10 @@ from flask_login import login_user, current_user, logout_user, login_required
 @app.route("/")
 @app.route("/home")
 def home():
-    posts = Post.query.all() # grabs all posts, that have been made 
+    # grabbing this "page" variable we can pass it to paginate 
+    page = request.args.get('page', 1, type = int) # we are grabbing the page, default page is 1, type int will cuz our site to appear a value error if someone passes anything other then integer as page number 
+    # with .order_by(Post.date_posted.desc() we can order out posts from new...to...old way
+    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page = page, per_page=5) # instead of query.all() we are using paginate method to be able to set amount of posts to preload (instead of loading them all once)  
     return render_template("home.html", posts = posts) 
 
 @app.route("/about")
@@ -93,27 +96,25 @@ def account():
     return render_template('account.html', title = 'Account',
                             image_file=image_file, form=form)
 
-# route to crate posts
+
 @app.route("/post/new", methods =['GET', 'POST']) 
 @login_required
 def new_post():
-    form = PostForm() # instance of the form to send 
+    form = PostForm() 
     if form.validate_on_submit():
         post = Post(title=form.title.data, content=form.content.data, author=current_user)
         db.session.add(post)
-        db.session.commit() # will add the post to db
+        db.session.commit() 
         flash("Your Post has been created", "success")
         return redirect(url_for("home"))
     return render_template('create_post.html', title = 'New Post', form = form, legend = 'New Post')
 
 
-# with flask we can make a variables within our routes
-# we want to create an id, where it is a part if the route
-# - <int:post_id> where "int" is what we can expect from the variable to be (can be "string" or etc...)
+
 @app.route("/post/new/<int:post_id>") 
 def post(post_id):
-    # lets fetch this post if it exists - we getting this by id
-    post = Post.query.get_or_404(post_id) # we can use a normal ".get" or ".first" to get the id, but ".get_or_404" will find the variable or return a 404 error (page does not exist) 
+    
+    post = Post.query.get_or_404(post_id) 
     return render_template('post.html', title = post.title, post=post)
 
 #update route 
@@ -121,9 +122,9 @@ def post(post_id):
 @login_required
 def update_post(post_id):
     post = Post.query.get_or_404(post_id)
-    # only the user who wrote this can update this post
+    
     if post.author != current_user:
-        abort(403) # 403 is http responce fpr a forbitten route 
+        abort(403) 
     form = PostForm()
     if form.validate_on_submit():
         post.title = form.title.data
@@ -131,7 +132,7 @@ def update_post(post_id):
         db.session.commit()
         flash('Your post has been updated !', 'success')
         return redirect(url_for('post', post_id=post.id))
-    elif request.method == 'GET': # then populate the for with below values (old text and title)
+    elif request.method == 'GET': 
         form.title.data = post.title
         form.content.data = post.content
     return render_template('create_post.html', title = 'Update Post', form = form, legend = 'Update Post')
@@ -147,6 +148,17 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post has been deleted !', 'success')
     return redirect(url_for('home'))
+
+
+# route to go to all users's post by clicking on the username's tag
+@app.route("/user/<string:username>")
+def user_posts(username):
+    page = request.args.get('page', 1, type = int)
+    user = User.query.filter_by(username=username).first_or_404() # get the first user with this username and if u get non, return 404 "no found" error 
+    posts = Post.query.filter_by(author=user)\
+        .order_by(Post.date_posted.desc())\
+        .paginate(page = page, per_page=5)
+    return render_template("user_posts.html", posts = posts, user=user) 
     
 
 
