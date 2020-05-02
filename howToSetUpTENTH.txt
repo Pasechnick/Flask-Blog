@@ -1,0 +1,24 @@
+"itsdangerous" package is preinstalled with flask
+
+> python3
+
+>>> from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
+>>> s = Serializer('secret', 30)  // we going to use it to pass a secret key and an expiration time in 30 seconds                 
+>>> token = s.dumps({'user_id': 1}).decode('utf-8')  // we need to decode cuz it is in bytes originally (after we have a token with expiration of 30 seconds)
+>>> token
+'eyJhbGciOiJIUzUxMiIsImlhdCI6MTU4ODQ0MjU4OSwiZXhwIjoxNTg4NDQyNjE5fQ.eyJ1c2
+VyX2lkIjoxfQ.kiQjTGzP2S61gdzgh-Rj0fBOe4JzymPjieTMzHkptUlxe4bEO9CdLJg24jIS8y7JDwI9QhdeyErc8RqIJtcAJQ'  // we get this huge random string token
+
+// if we quickly check this token then we run this and we get the payload of user_id
+>>> s.loads(token)
+{'user_id': 1} 
+
+>>> s.loads(token) // if we wait more then 30 seconds 
+itsdangerous.exc.SignatureExpired: Signature expired  // cuz 30 seconds left and it is expired
+
+
+we also need to install flask-mail extension 
+
+> pip3 install flask-mail
+

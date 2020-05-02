@@ -2,19 +2,19 @@ import os
 import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort 
-from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm 
+from flaskblog import app, db, bcrypt, mail # adding mail configuration 
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm # import RequestResetForm, ResetPasswordForm so we can make routes to manage them
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required 
+from flask_mail import Message # 
 
 
 @app.route("/")
 @app.route("/home")
 def home():
-    # grabbing this "page" variable we can pass it to paginate 
-    page = request.args.get('page', 1, type = int) # we are grabbing the page, default page is 1, type int will cuz our site to appear a value error if someone passes anything other then integer as page number 
-    # with .order_by(Post.date_posted.desc() we can order out posts from new...to...old way
-    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page = page, per_page=5) # instead of query.all() we are using paginate method to be able to set amount of posts to preload (instead of loading them all once)  
+    
+    page = request.args.get('page', 1, type = int) 
+    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page = page, per_page=5)
     return render_template("home.html", posts = posts) 
 
 @app.route("/about")
@@ -150,15 +150,68 @@ def delete_post(post_id):
     return redirect(url_for('home'))
 
 
-# route to go to all users's post by clicking on the username's tag
+
 @app.route("/user/<string:username>")
 def user_posts(username):
     page = request.args.get('page', 1, type = int)
-    user = User.query.filter_by(username=username).first_or_404() # get the first user with this username and if u get non, return 404 "no found" error 
+    user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(author=user)\
         .order_by(Post.date_posted.desc())\
         .paginate(page = page, per_page=5)
     return render_template("user_posts.html", posts = posts, user=user) 
+
+# with this function we can sent email with token and instructions to reset the password 
+# before we also need to install another flask extention flask-mail
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message('Password Reset Request', sender='noreply@demo.com', recipients=[user.email])
+    # _external=True needs to get an absolute url rather then a relative (like in our app directory)
+    msg.body = f''' To reset your password visit the folowing link:
+{url_for('reset_token', token = token, _external=True)} 
+
+If you did not make ths request then simply ignore this email and no changes will be made
+    '''
+    mail.send(msg)
+
+
+@app.route("/reset_password", methods =['GET', 'POST']) 
+def reset_request():
+    # making sure that the user is logged out
+    if current_user.is_authenticated: 
+        return redirect(url_for('home'))
+    form = RequestResetForm()
+    if form.validate_on_submit(): # at this point the user has submitted an email into our form, so we need to grab the user for that email
+        user = User.query.filter_by(email=form.email.data).first()
+        # after we got the user, we need to send this user an email with their token that so they can reset the password
+        send_reset_email(user)
+        flash('An email has been sent with instructions to reset ur password', 'info') 
+        return redirect(url_for('login'))
+    return render_template("reset_request.html", title = 'Reset Password', form=form)
+
+
+@app.route("/reset_password/<token>", methods =['GET', 'POST']) 
+def reset_token(token):
+    # making sure that the user is logged out
+    if current_user.is_authenticated: 
+        return redirect(url_for('home'))
+    user = User.verify_reset_token(token)
+    # if we dont get user back, it means the token is invalid or expired, so we put this conditional 
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('reset_request'))
+    # and if the token valid we 
+    form = ResetPasswordForm()
+    # gettong the password changed and saved to the db
+    if form.validate_on_submit():
+        hashed_pasword = bcrypt.generate_password_hash(form.password.data).decode('utf-8') 
+        user.password = hashed_pasword 
+        db.session.commit()
+        flash('Your password has been updated ! You are now able to log in', 'success')
+        return redirect(url_for('login'))
+    return render_template("reset_token.html", title = 'Reset Password', form=form)
+
+
+
     
 
 

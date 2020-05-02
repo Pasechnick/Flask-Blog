@@ -1,5 +1,6 @@
 from datetime import datetime
-from flaskblog import db, login_manager
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer # we need import this to be able to make tokens secret key and so on
+from flaskblog import db, login_manager, app 
 from flask_login import UserMixin 
 
  
@@ -13,12 +14,28 @@ class User(db.Model, UserMixin):
     
     username = db.Column(db.String(20), unique=True, nullable=False) 
     email = db.Column(db.String(120), unique=True, nullable=False) 
-    image_file = db.Column(db.String(20), nullable=False, default="default.jpg") # here is the connection to user image file 
+    image_file = db.Column(db.String(20), nullable=False, default="default.jpg") 
     password = db.Column(db.String(60), nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True) 
+
+    # we need to create methode to easy create some tokens
+    def get_reset_token(self, expires_sec=1800): # 1800 - 30 minutes 
+        s = Serializer(app.config['SECRET_KEY'], expires_sec) 
+        return s.dumps({'user_id': self.id}).decode('utf-8') # returns a token 
+
+    @staticmethod # not to expect that self parameter as an argument and we will accept only this token as an argument
+    def verify_reset_token(token): # takes in a token as an argument and if it is valid it will return the user with that user_id (user_id was the payload that we ave passed in in the initial token)
+        s = Serializer(app.config['SECRET_KEY']) # creates a serializer 
+        try: 
+            user_id = s.loads(token)['user_id'] # tries load that token
+        except:                                 # if it gets an exception 
+            return None                         # returns none 
+        return User.query.get(user_id)          # if there is no exception it returns user with it's id
     
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+
+    
 
     
 
@@ -31,3 +48,5 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"User('{self.title}', '{self.date_posted}')"
+
+
