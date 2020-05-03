@@ -1,0 +1,24 @@
+we need to move out app to the blueprint so we can split it up to be more modular 
+
+WE will restructure our app in different functions so we can create different instances 
+
+Application factory
+
+to create a blueprint we need to create a package in our app, that is named after its functionality
+
+so in order to tell python that a particular directory is a package we need to create "__init__.py" file inside this directory and it does not need to contain anything 
+ now within users, posts and main directories we have this 
+ we also need to create routes files that only has routes that "work with it's functionality"
+
+ same thing with forms...
+
+ we also need to take some functions from right now app and relocate them in this packages according to it's functionality
+
+ then we move routes from routes.py accordingly to packages...
+
+ then we can update some configuration of our app so we can create many other instances of our app to make some tests it different inputs and outputs
+
+
+ we move our configuration into a separate configuration file
+
+ we also need to make a creation file to be able to make different instances of the app with different configurations 

@@ -1,6 +1,7 @@
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer # we need import this to be able to make tokens secret key and so on
-from flaskblog import db, login_manager, app 
+from flask import current_app
+from flaskblog import db, login_manager
 from flask_login import UserMixin 
 
  
@@ -20,12 +21,12 @@ class User(db.Model, UserMixin):
 
     # we need to create methode to easy create some tokens
     def get_reset_token(self, expires_sec=1800): # 1800 - 30 minutes 
-        s = Serializer(app.config['SECRET_KEY'], expires_sec) 
+        s = Serializer(current_app.config['SECRET_KEY'], expires_sec) 
         return s.dumps({'user_id': self.id}).decode('utf-8') # returns a token 
 
     @staticmethod # not to expect that self parameter as an argument and we will accept only this token as an argument
     def verify_reset_token(token): # takes in a token as an argument and if it is valid it will return the user with that user_id (user_id was the payload that we ave passed in in the initial token)
-        s = Serializer(app.config['SECRET_KEY']) # creates a serializer 
+        s = Serializer(current_app.config['SECRET_KEY']) # creates a serializer 
         try: 
             user_id = s.loads(token)['user_id'] # tries load that token
         except:                                 # if it gets an exception 
